@@ -80,6 +80,59 @@ describe("ELF writer", function () {
         });
     });
 
+    it("allows a custom image load address", function () {
+        const code = make_byte_buffer(`
+            48 31 ff                # xor    rdi,rdi
+            48 c7 c0 3c 00 00 00    # mov    rax,0x3c
+            0f 05                   # syscall
+        `);
+        const base_address = 0x12340000;
+        const elf_image = elf_tools.build({
+            code,
+            base_address,
+        });
+        const entry_point = elf_image.readUInt32LE(0x18);
+        assert.strictEqual(entry_point & 0xffff0000, 0x12340000);
+    });
+
+    it("allows a custom entry point offset", function () {
+        const code = make_byte_buffer(`
+            90                      # nop
+            48 31 ff                # xor    rdi,rdi
+            48 c7 c0 3c 00 00 00    # mov    rax,0x3c
+            0f 05                   # syscall
+        `);
+        const base_address = 0x12340000;
+        const entry_offset = 1; // skip the nop
+        const elf_image = elf_tools.build({
+            code,
+            base_address,
+            entry_offset,
+        });
+        const entry_point = elf_image.readUInt32LE(0x18);
+        assert.strictEqual(entry_point, base_address + 0xb0 + entry_offset);
+    });
+
+    it("allows custom ELF header values", function () {
+        const code = make_byte_buffer(`
+            48 31 ff                # xor    rdi,rdi
+            48 c7 c0 3c 00 00 00    # mov    rax,0x3c
+            0f 05                   # syscall
+        `);
+        const elf_header = {
+            class: '32',
+            endian: 'msb',
+            osabi: 'arm',
+            abiversion: 'none',
+            type: 'exec',
+            machine: 'arm',
+        }
+        elf_tools.build({
+            code,
+            elf_header,
+        });
+    });
+
     it("throws on missing parameter", function () {
         assert.throws(() => elf_tools.build());
     });
