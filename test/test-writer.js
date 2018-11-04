@@ -157,4 +157,22 @@ describe("ELF writer", function () {
             code
         }));
     });
+
+    it("throws when base_address/entry_offset and elf_header.entry are defined", function () {
+        const code = Buffer.allocUnsafe(1);
+        assert.throws(() => elf_tools.build({
+            code,
+            base_address: 0x100000,
+            elf_header: {
+                entry: 0x200000,
+            }
+        }));
+        assert.throws(() => elf_tools.build({
+            code,
+            entry_offset: 1,
+            elf_header: {
+                entry: 0x200000,
+            }
+        }));
+    });
 });
