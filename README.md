@@ -97,12 +97,32 @@ const elf = elf_tools.parse(elf_bytes);
 
 Build an ELF image
 - **opts**: Object containing code and data to place inside the ELF image
-  - code: **Buffer**. Raw executable code bytes. The ELF builder places this data in a *.text* section with the ELF entry point pointing to the first byte. All calls to `build()` must include a code buffer. The caller must ensure the code bytes represent valid instructions for the target machine. **Important**: the code must be position-independant with no relocations.
-  - rodata: **Buffer** (optional). Raw read-only data bytes. The ELF builder places any read-only data in the *.text* section immediately following the code buffer. If this data needs aligning to a particular byte boundary, the code buffer should be padded accordingly.
-  - rwdata: **Buffer** (optional). Raw read/write data bytes. The ELF builder places any writable data in a *.data* section following the code and read-only data
-  - bss_length: **integer** (optional). Length of uninitialised (writable) data bytes. The ELF builder locates this data after the rwdata buffer. Although the data is "uninitialized" (because it takes up no space in the ELF image), when the image is run, this section is always zero-filled.
+  - **code**: *Buffer*. Raw executable code bytes. The ELF builder places this data in a *.text* section. All calls to `build()` must include a code buffer. The caller must ensure the code bytes represent valid instructions for the target machine. **Important**: the code must be position-independant with no relocations.
+  - **rodata**: *Buffer* (optional). Raw read-only data bytes. The ELF builder places any read-only data in the *.text* section immediately following the code buffer. If this data needs aligning to a particular byte boundary, the code buffer should be padded accordingly.
+  - **rwdata**: *Buffer* (optional). Raw read/write data bytes. The ELF builder places any writable data in a *.data* section following the code and read-only data
+  - **bss_length**: *integer* (optional). Length of uninitialised (writable) data bytes. The ELF builder locates this data after the rwdata buffer. Although the data is "uninitialized" (because it takes up no space in the ELF image), when the image is run, this section is always zero-filled.
+  - **base_address**: *integer* (optional). Memory address for loading the elf image (default: 0x400000)
+  - **entry_offset**: *integer* (optional). Byte offset into the code buffer for the first instruction (default: 0)
+  - **elf_header**: *Object* (optional). Custom ELF header values. See the notes below for the list of fields supported in this object.
   
 - returns **Buffer** containing the complete ELF image
+
+#### Customising the ELF header
+
+By default, the constructed ELF header contains values based upon your current executing platform. You can override some of these values by passing an **elf_header** object to `build()`. The customisable values include:
+
+- **elfsig**: *string* ELF signature
+- **class**: *string* `'32'` or `'64'` (note that this value is passed as a string, not an integer)
+- **endian**: *string* `'lsb'` or `'msb'`
+- **osabi**: *string* Any of the allowed values in `lib/constants.js`
+- **abiversion**: *string* Any of the allowed values in `lib/constants.js`
+- **type**: *string* Any of the allowed values in `lib/constants.js`
+- **machine**: *string* Any of the allowed values in `lib/constants.js`
+- **version**: *integer* Any of the allowed values in `lib/constants.js`
+- **entry**: *integer* ELF entrypoint. *Note*: this value cannot be set if either `base_address` or `entry_offset` are set.
+- **flags**: *integer*
+
+The default values for these fields can be found in `lib/elf_header.js`. Any customised values passed to `build()` are **not validated** - make sure you set correct values or the resulting ELF image is likely to be invalid.
 
 #### Example
 
