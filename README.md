@@ -2,6 +2,8 @@
 
 A NodeJS library for building and parsing ELF (Executable and Linker Format) binaries.
 
+**Important note**:  This library currently fails to build valid ELF binaries containing multiple section types due to kernel changes in the validation of ELF binaries. In particular, overlapping sections with different access rights are no longer permitted. See messages around https://lkml.org/lkml/2018/1/7/8
+
 ### Building an ELF image
 
 There are two ways to output an ELF image:
