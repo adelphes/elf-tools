@@ -14,7 +14,8 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "mocha": "^5.2.0"
+    "@types/node": "^14.0.25",
+    "mocha": "^8.0.1"
   },
   "author": "adelphes",
   "license": "MIT"
