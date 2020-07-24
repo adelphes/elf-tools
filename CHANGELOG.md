@@ -1,3 +1,6 @@
+## 1.1.2
+- Update Mocha package version and add @types/node to devDependencies
+
 ## 1.1.1
 - Add custom handling of 64-bit Buffer read and writes to fix Node v10 restrictions
 
